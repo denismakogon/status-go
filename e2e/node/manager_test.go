@@ -45,13 +45,6 @@ func (s *ManagerTestSuite) TestReferencesWithoutStartedNode() {
 			node.ErrNoRunningNode,
 		},
 		{
-			"non-null manager, no running node, ResetChainData()",
-			func() (interface{}, error) {
-				return s.NodeManager.ResetChainData()
-			},
-			node.ErrNoRunningNode,
-		},
-		{
 			"non-null manager, no running node, PopulateStaticPeers()",
 			func() (interface{}, error) {
 				return nil, s.NodeManager.PopulateStaticPeers()
@@ -303,28 +296,6 @@ func (s *ManagerTestSuite) TestStartNodeWithUpstreamEnabled() {
 	nodeStopped, err := s.NodeManager.StopNode()
 	s.NoError(err)
 	<-nodeStopped
-}
-
-// TODO(adam): fix this test to not use a different directory for blockchain data
-func (s *ManagerTestSuite) TestResetChainData() {
-	s.T().Skip()
-
-	s.StartTestNode()
-	defer s.StopTestNode()
-
-	EnsureNodeSync(s.NodeManager)
-
-	// reset chain data
-	nodeReady, err := s.NodeManager.ResetChainData()
-	s.NoError(err)
-	// new node, with previous config should be running
-	<-nodeReady
-	s.True(s.NodeManager.IsNodeRunning())
-
-	// make sure we can read the first byte, and it is valid (for Rinkeby)
-	firstHash, err := e2e.FirstBlockHash(s.NodeManager)
-	s.NoError(err)
-	s.Equal(GetHeadHash(), firstHash)
 }
 
 func (s *ManagerTestSuite) TestRestartNode() {
